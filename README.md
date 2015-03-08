@@ -1,3 +1,9 @@
+# Installation
+
+``npm install``
+
+## BrowserStack integration
+
 Use the BrowserStack credentials by exoprting your variables:
 
 ```bash
