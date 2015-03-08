@@ -28,21 +28,26 @@ describe('my webdriverio tests', function(){
       client = WebdriverIO.remote({ desiredCapabilities: {browserName: 'phantomjs'} });
     }
 
-    client.init(done);
+    client
+      .init(done)
+      .setViewportSize({
+        width: 1024,
+        height: 768
+      });
     WebdriverCSS.init(client);
   });
 
   it('Google test',function(done) {
     client
-      .url('https://google.com')
-      .webdrivercss('google', {name: 'homepage'})
+      .url('https://www.google.com/?gfe_rd=cr&ei=tMH8VONqy4fxB5rygZgD&gws_rd=ssl,cr&fg=1')
+      .webdrivercss('chrome', {name: 'google-homepage'})
       .call(done);
   });
 
   it('GitHub test',function(done) {
     client
-      .url('https://github.com')
-      .webdrivercss('github', {name: 'homepage'})
+      .url('http://amitaibu.com')
+      .webdrivercss('chrome', {name: 'amitaibu-homepage'})
       .call(done);
   });
 
