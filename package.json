@@ -1,9 +1,7 @@
 {
   "devDependencies": {
+    "mocha": "^2.2.0",
     "webdrivercss": "^1.0.6",
     "webdriverio": "^2.4.5"
-  },
-  "dependencies": {
-    "mocha": "^2.2.0"
   }
 }
