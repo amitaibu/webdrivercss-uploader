@@ -1,14 +1,32 @@
 var WebdriverIO = require('webdriverio');
 var WebdriverCSS = require('webdrivercss');
+var R = require('ramda');
+var request = require('request');
+var fs = require('fs');
 
 
 /**
  * Upload the image.
  *
- * @param value
+ * @param obj
  */
 var uploadFailedImage = function(obj) {
-  console.log(obj);
+  var url = 'http://localhost/boom/www/api/file-upload';
+  var req = request.post(url, function (err, res, body) {
+    if (err) {
+      console.log('Error!');
+    }
+    else {
+      console.log(body);
+    }
+  });
+  
+  var form = req.form();
+  form.append('baseline', fs.createReadStream(obj.baselinePath));
+  form.append('regression', fs.createReadStream(obj.regressionPath));
+  form.append('diff', fs.createReadStream(obj.diffPath));
+
+  throw new Error("Wrong file");
 };
 
 var isNotWithinMisMatchTolerance = R.filter(R.where({isWithinMisMatchTolerance: false}));
@@ -19,7 +37,7 @@ var processResults = function(err, res) {
   checkImages(res);
 }
 
-describe('my webdriverio tests', function() {
+describe('UI regression tests', function() {
 
   this.timeout(99999999);
   var client = {};
@@ -62,7 +80,7 @@ describe('my webdriverio tests', function() {
       .call(done);
   });
 
-  it('GitHub test',function(done) {
+  it('Personal site test',function(done) {
     client
       .url('http://amitaibu.com')
       .webdrivercss('chrome', {name: 'amitaibu-homepage'}, processResults)
