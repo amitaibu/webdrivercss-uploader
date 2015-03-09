@@ -1,7 +1,43 @@
 var WebdriverIO = require('webdriverio');
 var WebdriverCSS = require('webdrivercss');
+var R = require('ramda');
+var request = require('request');
+var fs = require('fs');
 
-describe('my webdriverio tests', function(){
+
+/**
+ * Upload the image.
+ *
+ * @param obj
+ */
+var uploadFailedImage = function(obj) {
+  var url = 'http://localhost/boom/www/api/file-upload';
+  var req = request.post(url, function (err, res, body) {
+    if (err) {
+      console.log('Error!');
+    }
+    else {
+      var data = JSON.parse(body);
+      throw new Error('Regression images uploaded to ' + data.data[0].self);
+
+    }
+  });
+
+  var form = req.form();
+  form.append('baseline', fs.createReadStream(obj.baselinePath));
+  form.append('regression', fs.createReadStream(obj.regressionPath));
+  form.append('diff', fs.createReadStream(obj.diffPath));
+};
+
+var isNotWithinMisMatchTolerance = R.filter(R.where({isWithinMisMatchTolerance: false}));
+var uploadImages = R.mapObj(R.forEach(uploadFailedImage));
+var checkImages = R.compose(uploadImages, R.mapObj(isNotWithinMisMatchTolerance));
+
+var processResults = function(err, res) {
+  checkImages(res);
+}
+
+describe('UI regression tests', function() {
 
   this.timeout(99999999);
   var client = {};
@@ -40,14 +76,14 @@ describe('my webdriverio tests', function(){
   it('Google test',function(done) {
     client
       .url('https://www.google.com/?gfe_rd=cr&ei=tMH8VONqy4fxB5rygZgD&gws_rd=ssl,cr&fg=1')
-      .webdrivercss('chrome', {name: 'google-homepage'})
+      .webdrivercss('chrome', {name: 'google-homepage'}, processResults)
       .call(done);
   });
 
-  it('GitHub test',function(done) {
+  it('Personal site test',function(done) {
     client
       .url('http://amitaibu.com')
-      .webdrivercss('chrome', {name: 'amitaibu-homepage'})
+      .webdrivercss('chrome', {name: 'amitaibu-homepage'}, processResults)
       .call(done);
   });
 
