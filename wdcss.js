@@ -17,16 +17,16 @@ var uploadFailedImage = function(obj) {
       console.log('Error!');
     }
     else {
-      console.log(body);
+      var data = JSON.parse(body);
+      throw new Error('Regression images uploaded to ' + data.data[0].self);
+
     }
   });
-  
+
   var form = req.form();
   form.append('baseline', fs.createReadStream(obj.baselinePath));
   form.append('regression', fs.createReadStream(obj.regressionPath));
   form.append('diff', fs.createReadStream(obj.diffPath));
-
-  throw new Error("Wrong file");
 };
 
 var isNotWithinMisMatchTolerance = R.filter(R.where({isWithinMisMatchTolerance: false}));
