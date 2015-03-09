@@ -1,7 +1,25 @@
 var WebdriverIO = require('webdriverio');
 var WebdriverCSS = require('webdrivercss');
 
-describe('my webdriverio tests', function(){
+
+/**
+ * Upload the image.
+ *
+ * @param value
+ */
+var uploadFailedImage = function(obj) {
+  console.log(obj);
+};
+
+var isNotWithinMisMatchTolerance = R.filter(R.where({isWithinMisMatchTolerance: false}));
+var uploadImages = R.mapObj(R.forEach(uploadFailedImage));
+var checkImages = R.compose(uploadImages, R.mapObj(isNotWithinMisMatchTolerance));
+
+var processResults = function(err, res) {
+  checkImages(res);
+}
+
+describe('my webdriverio tests', function() {
 
   this.timeout(99999999);
   var client = {};
@@ -40,14 +58,14 @@ describe('my webdriverio tests', function(){
   it('Google test',function(done) {
     client
       .url('https://www.google.com/?gfe_rd=cr&ei=tMH8VONqy4fxB5rygZgD&gws_rd=ssl,cr&fg=1')
-      .webdrivercss('chrome', {name: 'google-homepage'})
+      .webdrivercss('chrome', {name: 'google-homepage'}, processResults)
       .call(done);
   });
 
   it('GitHub test',function(done) {
     client
       .url('http://amitaibu.com')
-      .webdrivercss('chrome', {name: 'amitaibu-homepage'})
+      .webdrivercss('chrome', {name: 'amitaibu-homepage'}, processResults)
       .call(done);
   });
 
